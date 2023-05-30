@@ -63,10 +63,10 @@ function cleanup() {
 
 TEMP_DIR=$(mktemp -d)
 pushd $TEMP_DIR >/dev/null
-if whiptail --title "HOME ASSISTANT OS VM" --yesno "This will create a New Home Assistant OS VM. Proceed?" 10 58; then
+if whiptail --title "HOME ASSISTANT OS VM" --yesno "Este script vai criar uma nova instalção do Home Assistant numa máquina virtual. Continuar?" 10 58; then
   :
 else
-  header_info && echo -e "⚠ User exited script \n" && exit
+  header_info && echo -e "⚠ Instalação interrompida pelo utilizador \n" && exit
 fi
 
 function msg_info() {
@@ -86,9 +86,9 @@ function msg_error() {
 
 function pve_check() {
   if [ $(pveversion | grep -c "pve-manager/7\.[2-9]") -eq 0 ]; then
-    echo -e "${CROSS} This version of Proxmox Virtual Environment is not supported"
-    echo -e "Requires PVE Version 7.2 or higher"
-    echo -e "Exiting..."
+    echo -e "${CROSS} Esta versão do Proxmox Virtual Environment não é suportada"
+    echo -e "Requer a versão PVE 7.2 ou superior"
+    echo -e "A sair..."
     sleep 2
     exit
   fi
@@ -96,8 +96,8 @@ function pve_check() {
 
 function arch_check() {
   if [ "$(dpkg --print-architecture)" != "amd64" ]; then
-    echo -e "\n ${CROSS} This script will not work with PiMox! \n"
-    echo -e "Exiting..."
+    echo -e "\n ${CROSS} Este script não funciona com PiMox! \n"
+    echo -e "A sair..."
     sleep 2
     exit
   fi
@@ -106,8 +106,8 @@ function arch_check() {
 function ssh_check() {
   if command -v pveversion >/dev/null 2>&1; then
     if [ -n "${SSH_CLIENT:+x}" ]; then
-      if whiptail --defaultno --title "SSH DETECTED" --yesno "It's suggested to use the Proxmox shell instead of SSH, since SSH can create issues while gathering variables. Would you like to proceed with using SSH?" 10 62; then
-        echo "you've been warned"
+      if whiptail --defaultno --title "SSH DETETADO" --yesno "Sugere-se usar o shell Proxmox em vez do SSH, pois o SSH pode criar problemas durante a leitura das variáveis. Deseja continuar com SSH?" 10 62; then
+        echo "⚠ foste avisado ⚠"
       else
         clear
         exit
@@ -118,7 +118,7 @@ function ssh_check() {
 
 function exit-script() {
   clear
-  echo -e "⚠  User exited script \n"
+  echo -e "⚠  Instalação interrompida pelo utilizador \n"
   exit
 }
 
@@ -137,60 +137,60 @@ function default_settings() {
   VLAN=""
   MTU=""
   START_VM="yes"
-  echo -e "${DGN}Using HAOS Version: ${BGN}${BRANCH}${CL}"
-  echo -e "${DGN}Using Virtual Machine ID: ${BGN}${VMID}${CL}"
-  echo -e "${DGN}Using Machine Type: ${BGN}i440fx${CL}"
-  echo -e "${DGN}Using Disk Cache: ${BGN}Default${CL}"
-  echo -e "${DGN}Using Hostname: ${BGN}${HN}${CL}"
-  echo -e "${DGN}Using CPU Model: ${BGN}Default${CL}"
-  echo -e "${DGN}Allocated Cores: ${BGN}${CORE_COUNT}${CL}"
-  echo -e "${DGN}Allocated RAM: ${BGN}${RAM_SIZE}${CL}"
-  echo -e "${DGN}Using Bridge: ${BGN}${BRG}${CL}"
-  echo -e "${DGN}Using MAC Address: ${BGN}${MAC}${CL}"
-  echo -e "${DGN}Using VLAN: ${BGN}Default${CL}"
-  echo -e "${DGN}Using Interface MTU Size: ${BGN}Default${CL}"
-  echo -e "${DGN}Start VM when completed: ${BGN}yes${CL}"
-  echo -e "${BL}Creating a HAOS VM using the above default settings${CL}"
+  echo -e "${DGN}A usar a versão HAOS: ${BGN}${BRANCH}${CL}"
+  echo -e "${DGN}A usar Virtual Machine ID: ${BGN}${VMID}${CL}"
+  echo -e "${DGN}A usar Machine Type: ${BGN}i440fx${CL}"
+  echo -e "${DGN}A usar Disk Cache: ${BGN}Default${CL}"
+  echo -e "${DGN}A usar Hostname: ${BGN}${HN}${CL}"
+  echo -e "${DGN}A usar CPU Model: ${BGN}Default${CL}"
+  echo -e "${DGN}Número de Cores alocados: ${BGN}${CORE_COUNT}${CL}"
+  echo -e "${DGN}Memória RAM alocada: ${BGN}${RAM_SIZE}${CL}"
+  echo -e "${DGN}A usar Bridge: ${BGN}${BRG}${CL}"
+  echo -e "${DGN}A suar MAC Address: ${BGN}${MAC}${CL}"
+  echo -e "${DGN}A usar VLAN: ${BGN}Default${CL}"
+  echo -e "${DGN}A usar a interface MTU do tamanho: ${BGN}Default${CL}"
+  echo -e "${DGN}Iniciar a VM depois da conclusão?: ${BGN}yes${CL}"
+  echo -e "${BL}A criar HAOS VM usando das definições acima${CL}"
 }
 
 function advanced_settings() {
-  if BRANCH=$(whiptail --title "HAOS VERSION" --radiolist "Choose Version" --cancel-button Exit-Script 10 58 3 \
-    "$stable" "Stable  " ON \
+  if BRANCH=$(whiptail --title "VERSÃO DO HA" --radiolist "Escolha a versão" --cancel-button Exit-Script 10 58 3 \
+    "$stable" "Estável  " ON \
     "$beta" "Beta  " OFF \
-    "$dev" "Dev  " OFF \
+    "$dev" "Dev (em desenvolvimento)  " OFF \
     3>&1 1>&2 2>&3); then
-    echo -e "${DGN}Using HAOS Version: ${BGN}$BRANCH${CL}"
+    echo -e "${DGN}A usar a versão do HAOS: ${BGN}$BRANCH${CL}"
   else
     exit-script
   fi
 
   while true; do
-    if VMID=$(whiptail --inputbox "Set Virtual Machine ID" 8 58 $NEXTID --title "VIRTUAL MACHINE ID" --cancel-button Exit-Script 3>&1 1>&2 2>&3); then
+    if VMID=$(whiptail --inputbox "Definir o ID para a Máquina Virtual" 8 58 $NEXTID --title "ID MÁQUINA VIRTUAL" --cancel-button Exit-Script 3>&1 1>&2 2>&3); then
       if [ -z "$VMID" ]; then
         VMID="$NEXTID"
       fi
       if pct status "$VMID" &>/dev/null || qm status "$VMID" &>/dev/null; then
-        echo -e "${CROSS}${RD} ID $VMID is already in use${CL}"
+        echo -e "${CROSS}${RD} ID $VMID já está em uso${CL}"
         sleep 2
         continue
       fi
-      echo -e "${DGN}Virtual Machine ID: ${BGN}$VMID${CL}"
+      echo -e "${DGN}ID MÁQUINA VIRTUAL: ${BGN}$VMID${CL}"
       break
     else
       exit-script
     fi
   done
 
-  if MACH=$(whiptail --title "MACHINE TYPE" --radiolist --cancel-button Exit-Script "Choose Type" 10 58 2 \
+  if MACH=$(whiptail --title "TIPO DE MÁQUINA" --radiolist --cancel-button Exit-Script "Escolha o tipo" 10 58 2 \
     "i440fx" "Machine i440fx" ON \
     "q35" "Machine q35" OFF \
     3>&1 1>&2 2>&3); then
     if [ $MACH = q35 ]; then
-      echo -e "${DGN}Using Machine Type: ${BGN}$MACH${CL}"
+      echo -e "${DGN}A usar o tipo de máquina: ${BGN}$MACH${CL}"
       FORMAT=""
       MACHINE=" -machine q35"
     else
-      echo -e "${DGN}Using Machine Type: ${BGN}$MACH${CL}"
+      echo -e "${DGN}A usar o tipo de máquina: ${BGN}$MACH${CL}"
       FORMAT=",efitype=4m"
       MACHINE=""
     fi
@@ -198,9 +198,9 @@ function advanced_settings() {
     exit-script
   fi
 
-  if DISK_CACHE1=$(whiptail --title "DISK CACHE" --radiolist "Choose" --cancel-button Exit-Script 10 58 2 \
-    "0" "Default" ON \
-    "1" "Write Through" OFF \
+  if DISK_CACHE1=$(whiptail --title "CACHE DO DISCO" --radiolist "Escolher" --cancel-button Exit-Script 10 58 2 \
+    "0" "Por defeito" ON \
+    "1" "Escreva através" OFF \
     3>&1 1>&2 2>&3); then
     if [ $DISK_CACHE1 = "1" ]; then
       echo -e "${DGN}Using Disk Cache: ${BGN}Write Through${CL}"
@@ -213,19 +213,19 @@ function advanced_settings() {
     exit-script
   fi
 
-  if VM_NAME=$(whiptail --inputbox "Set Hostname" 8 58 haos${BRANCH} --title "HOSTNAME" --cancel-button Exit-Script 3>&1 1>&2 2>&3); then
+  if VM_NAME=$(whiptail --inputbox "Definir nome do hostname" 8 58 haos${BRANCH} --title "HOSTNAME" --cancel-button Exit-Script 3>&1 1>&2 2>&3); then
     if [ -z $VM_NAME ]; then
       HN="haos${BRANCH}"
-      echo -e "${DGN}Using Hostname: ${BGN}$HN${CL}"
+      echo -e "${DGN}A usar o Hostname: ${BGN}$HN${CL}"
     else
       HN=$(echo ${VM_NAME,,} | tr -d ' ')
-      echo -e "${DGN}Using Hostname: ${BGN}$HN${CL}"
+      echo -e "${DGN}A usar o Hostname: ${BGN}$HN${CL}"
     fi
   else
     exit-script
   fi
 
-  if CPU_TYPE1=$(whiptail --title "CPU MODEL" --radiolist "Choose" --cancel-button Exit-Script 10 58 2 \
+  if CPU_TYPE1=$(whiptail --title "MODELO DO CPU" --radiolist "Escolher" --cancel-button Exit-Script 10 58 2 \
     "0" "KVM64 (Default)" ON \
     "1" "Host" OFF \
     3>&1 1>&2 2>&3); then
@@ -240,40 +240,40 @@ function advanced_settings() {
     exit-script
   fi
 
-  if CORE_COUNT=$(whiptail --inputbox "Allocate CPU Cores" 8 58 2 --title "CORE COUNT" --cancel-button Exit-Script 3>&1 1>&2 2>&3); then
+  if CORE_COUNT=$(whiptail --inputbox "Alocar quantos Cores" 8 58 2 --title "CORE COUNT" --cancel-button Exit-Script 3>&1 1>&2 2>&3); then
     if [ -z $CORE_COUNT ]; then
       CORE_COUNT="2"
-      echo -e "${DGN}Allocated Cores: ${BGN}$CORE_COUNT${CL}"
+      echo -e "${DGN}Cores alocados: ${BGN}$CORE_COUNT${CL}"
     else
-      echo -e "${DGN}Allocated Cores: ${BGN}$CORE_COUNT${CL}"
+      echo -e "${DGN}Cores alocados: ${BGN}$CORE_COUNT${CL}"
     fi
   else
     exit-script
   fi
 
-  if RAM_SIZE=$(whiptail --inputbox "Allocate RAM in MiB" 8 58 4096 --title "RAM" --cancel-button Exit-Script 3>&1 1>&2 2>&3); then
+  if RAM_SIZE=$(whiptail --inputbox "Alocar número de RAM em MiB" 8 58 4096 --title "RAM" --cancel-button Exit-Script 3>&1 1>&2 2>&3); then
     if [ -z $RAM_SIZE ]; then
       RAM_SIZE="4096"
-      echo -e "${DGN}Allocated RAM: ${BGN}$RAM_SIZE${CL}"
+      echo -e "${DGN}Alocado RAM: ${BGN}$RAM_SIZE${CL}"
     else
-      echo -e "${DGN}Allocated RAM: ${BGN}$RAM_SIZE${CL}"
+      echo -e "${DGN}Alocado RAM: ${BGN}$RAM_SIZE${CL}"
     fi
   else
     exit-script
   fi
 
-  if BRG=$(whiptail --inputbox "Set a Bridge" 8 58 vmbr0 --title "BRIDGE" --cancel-button Exit-Script 3>&1 1>&2 2>&3); then
+  if BRG=$(whiptail --inputbox "Definir a Bridge" 8 58 vmbr0 --title "BRIDGE" --cancel-button Exit-Script 3>&1 1>&2 2>&3); then
     if [ -z $BRG ]; then
       BRG="vmbr0"
-      echo -e "${DGN}Using Bridge: ${BGN}$BRG${CL}"
+      echo -e "${DGN}A usar Bridge: ${BGN}$BRG${CL}"
     else
-      echo -e "${DGN}Using Bridge: ${BGN}$BRG${CL}"
+      echo -e "${DGN}A usar Bridge: ${BGN}$BRG${CL}"
     fi
   else
     exit-script
   fi
 
-  if MAC1=$(whiptail --inputbox "Set a MAC Address" 8 58 $GEN_MAC --title "MAC ADDRESS" --cancel-button Exit-Script 3>&1 1>&2 2>&3); then
+  if MAC1=$(whiptail --inputbox "Definir o MAC Address" 8 58 $GEN_MAC --title "MAC ADDRESS" --cancel-button Exit-Script 3>&1 1>&2 2>&3); then
     if [ -z $MAC1 ]; then
       MAC="$GEN_MAC"
       echo -e "${DGN}Using MAC Address: ${BGN}$MAC${CL}"
