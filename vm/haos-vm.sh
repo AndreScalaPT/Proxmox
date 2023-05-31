@@ -5,6 +5,9 @@
 # License: MIT
 # https://github.com/tteck/Proxmox/raw/main/LICENSE
 
+# Este script foi alterado por mim para adequar às minhas necessidades
+# para o script original por favor visitar tteck/Proxmox
+
 function header_info {
   clear
   cat <<"EOF"
@@ -14,10 +17,17 @@ function header_info {
  / __  / /_/ / / / / / /  __/  / ___ |(__  |__  ) (__  ) /_/ /_/ / / / / /_   / /_/ /___/ /
 /_/ /_/\____/_/ /_/ /_/\___/  /_/  |_/____/____/_/____/\__/\__,_/_/ /_/\__/   \____//____/
 
+    _    _   _ ____  ____  _____ ____   ____    _    _        _      ____ _____ 
+    / \  | \ | |  _ \|  _ \| ____/ ___| / ___|  / \  | |      / \    |  _ \_   _|
+   / _ \ |  \| | | | | |_) |  _| \___ \| |     / _ \ | |     / _ \   | |_) || |  
+  / ___ \| |\  | |_| |  _ <| |___ ___) | |___ / ___ \| |___ / ___ \ _|  __/ | |  
+ /_/   \_\_| \_|____/|_| \_\_____|____/ \____/_/   \_\_____/_/   \_(_)_|    |_|  
+                                                                                 
+
 EOF
 }
 header_info
-echo -e "\n Loading..."
+echo -e "\n A carregar..."
 GEN_MAC=02:$(openssl rand -hex 5 | awk '{print toupper($0)}' | sed 's/\(..\)/\1:/g; s/.$//')
 NEXTID=$(pvesh get /cluster/nextid)
 VERSIONS=(stable beta dev)
