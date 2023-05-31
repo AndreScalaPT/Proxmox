@@ -73,7 +73,7 @@ function cleanup() {
 
 TEMP_DIR=$(mktemp -d)
 pushd $TEMP_DIR >/dev/null
-if whiptail --title "HOME ASSISTANT OS VM" --simnão "Este script vai criar uma nova instalação do Home Assistant numa máquina virtual. Continuar?" 10 58; then
+if whiptail --title "HOME ASSISTANT OS VM" --yesno "Este script vai criar uma nova instalação do Home Assistant numa máquina virtual. Continuar?" 10 58; then
   :
 else
   header_info && echo -e "⚠ Instalação interrompida pelo utilizador \n" && exit
