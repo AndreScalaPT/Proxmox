@@ -54,7 +54,7 @@ function error_handler() {
   local exit_code="$?"
   local line_number="$1"
   local command="$2"
-  local error_message="${RD}[ERROR]${CL} in line ${RD}$line_number${CL}: exit code ${RD}$exit_code${CL}: while executing command ${YW}$command${CL}"
+  local error_message="${RD}[ERROR]${CL} na linha ${RD}$line_number${CL}: código de saída ${RD}$exit_code${CL}: enquanto executava o comando ${YW}$command${CL}"
   echo -e "\n$error_message\n"
   cleanup_vmid
 }
