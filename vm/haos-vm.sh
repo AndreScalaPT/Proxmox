@@ -322,10 +322,10 @@ function advanced_settings() {
   fi
 
   if (whiptail --title "INICIAR A MÁQUINA VIRTUAL" --yesno "Iniciar VM quando concluída?" 10 58); then
-    echo -e "${DGN}Iniciar VM quando concluída: ${BGN}yes${CL}"
+    echo -e "${DGN}Iniciar VM quando concluída: ${BGN}sim${CL}"
     START_VM="yes"
   else
-    echo -e "${DGN}Iniciar VM quando concluída: ${BGN}no${CL}"
+    echo -e "${DGN}Iniciar VM quando concluída: ${BGN}não${CL}"
     START_VM="no"
   fi
 
