@@ -286,66 +286,66 @@ function advanced_settings() {
   if MAC1=$(whiptail --inputbox "Definir o MAC Address" 8 58 $GEN_MAC --title "MAC ADDRESS" --cancel-button Exit-Script 3>&1 1>&2 2>&3); then
     if [ -z $MAC1 ]; then
       MAC="$GEN_MAC"
-      echo -e "${DGN}Using MAC Address: ${BGN}$MAC${CL}"
+      echo -e "${DGN}A usar o endereço MAC: ${BGN}$MAC${CL}"
     else
       MAC="$MAC1"
-      echo -e "${DGN}Using MAC Address: ${BGN}$MAC1${CL}"
+      echo -e "${DGN}A usar o endereço MAC: ${BGN}$MAC1${CL}"
     fi
   else
     exit-script
   fi
 
-  if VLAN1=$(whiptail --inputbox "Set a Vlan(leave blank for default)" 8 58 --title "VLAN" --cancel-button Exit-Script 3>&1 1>&2 2>&3); then
+  if VLAN1=$(whiptail --inputbox "Definir a Vlan(deixe em branco para o padrão)" 8 58 --title "VLAN" --cancel-button Exit-Script 3>&1 1>&2 2>&3); then
     if [ -z $VLAN1 ]; then
       VLAN1="Default"
       VLAN=""
-      echo -e "${DGN}Using Vlan: ${BGN}$VLAN1${CL}"
+      echo -e "${DGN}A usar Vlan: ${BGN}$VLAN1${CL}"
     else
       VLAN=",tag=$VLAN1"
-      echo -e "${DGN}Using Vlan: ${BGN}$VLAN1${CL}"
+      echo -e "${DGN}A usar Vlan: ${BGN}$VLAN1${CL}"
     fi
   else
     exit-script
   fi
 
-  if MTU1=$(whiptail --inputbox "Set Interface MTU Size (leave blank for default)" 8 58 --title "MTU SIZE" --cancel-button Exit-Script 3>&1 1>&2 2>&3); then
+  if MTU1=$(whiptail --inputbox "Defina o tamanho da interface MTU (deixe em branco para o padrão)" 8 58 --title "TAMANHO DA MTU" --cancel-button Exit-Script 3>&1 1>&2 2>&3); then
     if [ -z $MTU1 ]; then
       MTU1="Default"
       MTU=""
-      echo -e "${DGN}Using Interface MTU Size: ${BGN}$MTU1${CL}"
+      echo -e "${DGN}A usar o Tamanho da Interface MTU: ${BGN}$MTU1${CL}"
     else
       MTU=",mtu=$MTU1"
-      echo -e "${DGN}Using Interface MTU Size: ${BGN}$MTU1${CL}"
+      echo -e "${DGN}A usar o Tamanho da Interface MTU: ${BGN}$MTU1${CL}"
     fi
   else
     exit-script
   fi
 
-  if (whiptail --title "START VIRTUAL MACHINE" --yesno "Start VM when completed?" 10 58); then
-    echo -e "${DGN}Start VM when completed: ${BGN}yes${CL}"
+  if (whiptail --title "INICIAR A MÁQUINA VIRTUAL" --yesno "Iniciar VM quando concluída?" 10 58); then
+    echo -e "${DGN}Iniciar VM quando concluída: ${BGN}yes${CL}"
     START_VM="yes"
   else
-    echo -e "${DGN}Start VM when completed: ${BGN}no${CL}"
+    echo -e "${DGN}Iniciar VM quando concluída: ${BGN}no${CL}"
     START_VM="no"
   fi
 
-  if (whiptail --title "ADVANCED SETTINGS COMPLETE" --yesno "Ready to create HAOS ${BRANCH} VM?" --no-button Do-Over 10 58); then
-    echo -e "${RD}Creating a HAOS VM using the above advanced settings${CL}"
+  if (whiptail --title "CONFIGURAÇÕES AVANÇADAS COMPLETAS" --yesno "Pronto pra criar a VM HAOS ${BRANCH} VM?" --no-button Do-Over 10 58); then
+    echo -e "${RD}A criar uma VM HAOS usando as configurações avançadas acima${CL}"
   else
     header_info
-    echo -e "${RD}Using Advanced Settings${CL}"
+    echo -e "${RD}A usar as configurações avançadas${CL}"
     advanced_settings
   fi
 }
 
 function start_script() {
-  if (whiptail --title "SETTINGS" --yesno "Use Default Settings?" --no-button Advanced 10 58); then
+  if (whiptail --title "DEFINIÇÕES" --yesno "Usar as configurações padrão?" --no-button Avançadas 10 58); then
     header_info
-    echo -e "${BL}Using Default Settings${CL}"
+    echo -e "${BL}A usar as configurações padrão${CL}"
     default_settings
   else
     header_info
-    echo -e "${RD}Using Advanced Settings${CL}"
+    echo -e "${RD}A usar as configurações avançadas${CL}"
     advanced_settings
   fi
 }
@@ -355,7 +355,7 @@ pve_check
 ssh_check
 start_script
 
-msg_info "Validating Storage"
+msg_info "A validar armazenamento"
 while read -r line; do
   TAG=$(echo $line | awk '{print $1}')
   TYPE=$(echo $line | awk '{printf "%-10s", $2}')
@@ -369,21 +369,21 @@ while read -r line; do
 done < <(pvesm status -content images | awk 'NR>1')
 VALID=$(pvesm status -content images | awk 'NR>1')
 if [ -z "$VALID" ]; then
-  msg_error "Unable to detect a valid storage location."
+  msg_error "Não foi possível detectar um local de armazenamento válido."
   exit
 elif [ $((${#STORAGE_MENU[@]} / 3)) -eq 1 ]; then
   STORAGE=${STORAGE_MENU[0]}
 else
   while [ -z "${STORAGE:+x}" ]; do
-    STORAGE=$(whiptail --title "Storage Pools" --radiolist \
-      "Which storage pool you would like to use for ${HN}?\nTo make a selection, use the Spacebar.\n" \
+    STORAGE=$(whiptail --title "Armazenamento" --radiolist \
+      "Qual a localização de armazenamento gostaria de usar ${HN}?\nPara selecionar use a Barra de Espaço.\n" \
       16 $(($MSG_MAX_LENGTH + 23)) 6 \
       "${STORAGE_MENU[@]}" 3>&1 1>&2 2>&3) || exit
   done
 fi
-msg_ok "Using ${CL}${BL}$STORAGE${CL} ${GN}for Storage Location."
-msg_ok "Virtual Machine ID is ${CL}${BL}$VMID${CL}."
-msg_info "Retrieving the URL for Home Assistant ${BRANCH} Disk Image"
+msg_ok "A usar ${CL}${BL}$STORAGE${CL} ${GN} para local de armazenamento."
+msg_ok "O ID da Máquina Virtual é ${CL}${BL}$VMID${CL}."
+msg_info "A obter o URL do Home Assistant ${BRANCH} Disk Image"
 if [ "$BRANCH" == "$dev" ]; then
   URL=https://os-builds.home-assistant.io/${BRANCH}/haos_ova-${BRANCH}.qcow2.xz
 else
@@ -394,8 +394,8 @@ msg_ok "${CL}${BL}${URL}${CL}"
 wget -q --show-progress $URL
 echo -en "\e[1A\e[0K"
 FILE=$(basename $URL)
-msg_ok "Downloaded ${CL}${BL}haos_ova-${BRANCH}.qcow2.xz${CL}"
-msg_info "Extracting KVM Disk Image"
+msg_ok "Download completo ${CL}${BL}haos_ova-${BRANCH}.qcow2.xz${CL}"
+msg_info "A extrair KVM Disk Image"
 unxz $FILE
 STORAGE_TYPE=$(pvesm status -storage $STORAGE | awk 'NR>1 {print $2}')
 case $STORAGE_TYPE in
@@ -418,8 +418,8 @@ for i in {0,1}; do
   eval DISK${i}=vm-${VMID}-disk-${i}${DISK_EXT:-}
   eval DISK${i}_REF=${STORAGE}:${DISK_REF:-}${!disk}
 done
-msg_ok "Extracted KVM Disk Image"
-msg_info "Creating HAOS VM"
+msg_ok "Extraída KVM Disk Image"
+msg_info "A criar HAOS VM"
 qm create $VMID -agent 1${MACHINE} -tablet 0 -localtime 1 -bios ovmf${CPU_TYPE} -cores $CORE_COUNT -memory $RAM_SIZE \
   -name $HN -tags proxmox-helper-scripts -net0 virtio,bridge=$BRG,macaddr=$MAC$VLAN$MTU -onboot 1 -ostype l26 -scsihw virtio-scsi-pci
 pvesm alloc $STORAGE $VMID $DISK0 4M 1>&/dev/null
@@ -431,10 +431,10 @@ qm set $VMID \
   -description "# Home Assistant OS
 ### https://github.com/tteck/Proxmox
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/D1D7EP4GF)" >/dev/null
-msg_ok "Created HAOS VM ${CL}${BL}(${HN})"
+msg_ok "Criada HAOS VM ${CL}${BL}(${HN})"
 if [ "$START_VM" == "yes" ]; then
   msg_info "Starting Home Assistant OS VM"
   qm start $VMID
-  msg_ok "Started Home Assistant OS VM"
+  msg_ok "A iniciar o Assistant OS VM"
 fi
-msg_ok "Completed Successfully!\n"
+msg_ok "Concluido com sucesso!\n"
